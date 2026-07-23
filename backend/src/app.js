@@ -26,20 +26,32 @@ app.use(
   })
 );
 
-// CORS
+// CORS — allow storefront + admin (no trailing slash)
+const normalizeOrigin = (url) => (url ? String(url).trim().replace(/\/$/, '') : '');
+
 const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  process.env.ADMIN_URL,
-  'http://localhost:5173',
-  'http://localhost:5174',
-].filter(Boolean);
+  ...new Set(
+    [
+      process.env.FRONTEND_URL,
+      process.env.ADMIN_URL,
+      ...(process.env.ALLOWED_ORIGINS || '').split(','),
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'https://ecommerce-project-1-i8v1.onrender.com',
+    ]
+      .map(normalizeOrigin)
+      .filter(Boolean)
+  ),
+];
 
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      const reqOrigin = normalizeOrigin(origin);
+      if (!reqOrigin || allowedOrigins.includes(reqOrigin)) {
         callback(null, true);
       } else {
+        console.warn('CORS blocked origin:', origin, '| allowed:', allowedOrigins);
         callback(new AppError('Not allowed by CORS', 403));
       }
     },
