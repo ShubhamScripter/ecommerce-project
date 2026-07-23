@@ -38,6 +38,7 @@ const allowedOrigins = [
       'http://localhost:5173',
       'http://localhost:5174',
       'https://ecommerce-project-1-i8v1.onrender.com',
+      'https://admin-vmtl.onrender.com',
     ]
       .map(normalizeOrigin)
       .filter(Boolean)
